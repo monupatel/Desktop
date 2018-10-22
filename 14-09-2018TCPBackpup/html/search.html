@@ -1,0 +1,420 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>search</title>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="/sites/vsm/SiteApplication/Assets/css/bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="/sites/vsm/SiteApplication/Assets/css/uniform.default.css"/>
+<link rel="stylesheet" type="text/css" href="/sites/vsm/SiteApplication/Assets/css/jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="/sites/vsm/SiteApplication/Assets/css/jquery.fancybox.css"/>	
+<link rel="stylesheet" type="text/css" href="/sites/vsm/SiteApplication/Assets/css/style.css"/>	
+
+
+<script src="/sites/vsm/SiteApplication/Assets/customeJs/Angular/pagesjs/searchPage.js"></script>
+<script src="/sites/vsm/SiteApplication/Assets/customeJs/Angular/pagesjs/common.js"></script>
+<script src="/sites/vsm/SiteApplication/Assets/customeJs/Angular/HttpServiceCollection.js"></script>
+<script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip-utils@0.0.2/dist/jszip-utils.min.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="/sites/vsm/SiteApplication/Assets/js/ie8.js"/></script>
+<![endif]-->
+<style unselectable=”on”>  
+    /* On site page hide left navigation menu */  
+     
+    #sideNavBox {  
+        display: none;  
+    }  
+    /* adjust position of content on site page */  
+     
+    #contentBox {  
+        margin-left: 20px!important;  
+    }  
+    #s4-titlerow{
+	  display:none!important;
+	}
+	#WebPartWPQ2_ChromeTitle{
+	  display:none!important;
+	}
+   .ms-cui-topBar2{
+	  display:none!important;
+	}
+    .tcp-header{
+	 top:0px;
+    }
+    
+    .tcp-homeInbox {
+	 top:0px;
+    }
+    .tcp-leftSidebar
+    {
+	 top:0px;
+    }    
+    .tcp-homeContent {
+       padding: 0px 0 20px 35px;
+    }
+  .tcp-header.tcp-search-bx .search-but {
+    width: 24px;
+    }
+    #WebPartWPQ2{
+	  border:none;
+	}
+#O365_NavHeader{
+	display:none
+}
+.tcp-contentSection{
+	padding:0px 0 51px 250px;
+}
+
+</style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor msdt:dt="string">Besart Alajbegu</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author msdt:dt="string">Besart Alajbegu</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body ng-app="searchApp" ng-controller="searchCtrl" ng-cloak>
+
+	<!--main wrapper start-->
+	<div class="wrapper">
+		
+		<!--header start-->
+		<div class="tcp-header">
+			
+			<a href="#" class="tcp-logo">
+				<img src="/sites/vsm/SiteApplication/Assets/images/tcp-logo.png" width="302" height="104" alt="The Children's Place" class="img-responsive"/>
+			</a>
+			
+			<strong class="tcp-page-title">Search</strong>
+			
+			<div class="tcp-search-bx">
+				<input type="text" value="" placeholder="SEARCH BY TASK ID" class="search-txtbx" ng-model="globalSearch"  ng-keyup="$event.keyCode == 13 ? GlobalSearch() : null"/>
+				<input type="button" value="" class="search-but"  ng-click="GlobalSearch()"/>
+				<div class="clearfix"></div>
+			</div>
+			
+			<a class="create-task-but createtaskFancy ShowHover" ng-style="roleVisible" ng-click="CheckDraft()"><span>+</span> CREATE NEW TASK</a>
+			
+			<div class="clearfix"></div>
+			
+		</div>
+		<!--header end-->
+	
+		<!--left sidebar start-->
+		<div class="tcp-leftSidebar">
+			
+			<div class="username-bx">				
+				<div class="dispTable">				
+					<div class="dispTablecell">						
+						<span class="profile-pic">
+						    <img src="{{profileImage}}" width="100" height="100" alt="" style="border-radius: 50%;" class="img-responsive">
+						</span>
+						<span class="username-txt">
+							{{Uname}}
+						</span>												
+					</div>					
+				</div>				
+			</div>
+			
+			<div class="sidebar-nav">
+				<ul>
+					<li>
+						<a href="#" ng-click="HomeRedirect()"><span class="iconWidth"><span class="home-icon iconStyle"></span></span> Home</a>
+					</li>
+					<li class="nav-dropdown">
+						<a href="#" class="selected" ng-click="TaskManagementRedirect()"><span class="iconWidth"><span class="task-icon iconStyle"></span></span> Task Management</a>
+						<ul ng-if="hideDraftCheck || ArchiveVisible">
+							<li ng-if="hideDraftCheck">
+								<a class="ShowHover" href="/sites/vsm/SiteApplication/TaskManagement/Draft.aspx">Drafts</a>
+							</li>
+							<li ng-if="ArchiveVisible">
+								<a class="ShowHover" href="/sites/vsm/SiteApplication/TaskManagement/Archived.aspx">Archived</a>
+							</li>
+
+						</ul>
+					</li>
+					<li ng-if="userdata.role =='Corporate Employee'||userdata.role =='Corporate VP Visual'||userdata.role =='Corporate VP Operational'">
+						<a href="/sites/vsm/SiteApplication/Reports/Report.aspx"><span class="iconWidth"><span class="report-icon iconStyle"></span></span> Reports</a>
+					</li>
+					<li ng-if="userdata.role =='Corporate Employee'||userdata.role =='Corporate VP Visual'||userdata.role =='Corporate VP Operational'">
+						<a href="/sites/vsm/SiteApplication/Settings/Settings.aspx"><span class="iconWidth"><span class="setting-icon iconStyle"></span></span> Settings</a>
+					</li>
+				</ul>
+				<div class="clearfix"></div>
+			</div>
+			
+			<a href="#" ng-click="Logout()" class="tcp-logout"><span class="logout-icon"></span> Log Out</a>
+			
+		</div>
+		<!--left sidebar end-->
+		
+		<!--content section start-->
+		<div class="tcp-contentSection">
+			
+			<div class="tcp-taskmangTable" ng-if="searchdata.length>0">
+			
+			 <h3>Search Results for "{{searchlocaldata.searchId}}"</h3><br/><br/>
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tbody>
+								<tr class="bgcol1">
+									<th width="7.5%" scope="col" ng-click="orderByField='ID'; reverseSort = !reverseSort">Task ID <span ng-show="orderByField == 'ID'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span> </th>
+									<th width="18%" scope="col" ng-click="orderByField='taskName'; reverseSort = !reverseSort">Task Name <span ng-show="orderByField == 'taskName'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span></th>
+								
+									<th width="12%" scope="col" ng-click="orderByField='taskLiveDate'; reverseSort = !reverseSort">Live Date <span ng-show="orderByField == 'taskLiveDate'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span></th>
+									<th width="12%" scope="col" ng-click="orderByField='taskEndDate'; reverseSort = !reverseSort">Close Date <span ng-show="orderByField == 'taskEndDate'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span></th>
+									<th width="11.5%" scope="col" ng-click="orderByField='StoreCount'; reverseSort = !reverseSort">Assigned to <span ng-show="orderByField == 'StoreCount'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span></th>
+									
+									<th width="10.5%" scope="col"  ng-click="orderByField='Status'; reverseSort = !reverseSort">Status<span ng-show="orderByField == 'Status'"><span ng-show="!reverseSort"><span class="blue-top-arrow"></span></span><span ng-show="reverseSort"><span class="blue-btm-arrow"></span></span></span></th>
+									<th width="6.5%" scope="col" >EXPORT</th>
+									<th width="4.5%" scope="col">Edit</th>
+									<th width="4.5%" scope="col">Delete</th>
+								</tr>
+								<tr class="bgcol1"  ng-repeat="s in searchdata|orderBy:orderByField:reverseSort">
+									<td>{{s.ID}}</td>
+								     <td><a class="ShowHover" ng-click="taskDetails(s.ID)">{{s.taskName}}</a></td>
+								     <td>{{s.taskLiveDate | date:'MM/dd/yyyy'}}</td>
+								     <td>{{s.taskEndDate  | date:'MM/dd/yyyy'}}</td>
+									<td class="storeList">
+										<a href="javascript:;" class="openStore" ng-click="getStoreList(s.ID)" >{{s.StoreCount}} Stores</a>
+										<div class="storeListbx">												
+											<div class="storeListCont">
+												<h6>{{s.StoreCount}} Stores</h6>
+												<ul>
+													<li ng-repeat="st in allstorelist">
+														<span class="storeName"><a href="#">{{st.storeId.storeName}}</a></span>
+														<span class="storeStatus">{{st.status.name}}</span>
+													</li>													
+												</ul>
+												<div class="clearfix"></div>
+											</div>
+										</div>
+									</td><td>{{s.StatusPercentage}} %</td>
+								     <td><div class="text-center"><a href="#" class="export-but"  ng-click="AttchmentFilter(s.ID,s.taskName)">&nbsp;</a></div></td>
+									 <td ><div class="text-center"><a href="#"  ng-class="setEditClass(s.visibleAction)" ng-click="s.visibleAction === false || TaskEdit(s.ID)">&nbsp;</a></div></td>
+								     <td><div class="text-center"><a href="#ConfirmdeletePopup" ng-class="setDeleteClass(s.visibleAction)"  ng-click="s.visibleAction === false || deleterecord(s.ID,s.DistrictId,s.RegionId,s.CreaterId,s.RoleCreater)">&nbsp;</a></div></td>
+								  </tr>							
+                                								
+							</tbody>
+						</table>
+					</div>
+					<div ng-if="searchdata.length==0">
+					    <h1><b>Search Results for "{{searchlocaldata.searchId}}"</b></h1><br/><br/>
+					   <h3><b>We’re sorry, but there are no results found.</b></h3>
+					   Search suggestions:
+					   <ul>
+					   
+
+					     <li>Search By the X-Digit Task Id.</li>
+					     <li>Still no luck? Try contacting <a href="/sites/vsm/SiteApplication/HelpDesk/HelpDesk.aspx"><u>Help Desk.</u></a></li>
+					   </ul>
+					</div>
+
+			
+		</div>
+		<!--content section end-->
+		
+		<!--filter sidebar start-->
+		
+		<!--filter sidebar end-->
+				
+		<!--footer start-->
+		<div class="tcp-footer">
+			
+			<a href="/sites/vsm/SiteApplication/HelpDesk/HelpDesk.aspx" class="tcp-helpDesk">Help Desk</a>
+			
+		</div>
+		<!--footer end-->
+		
+		<!--export sidebar start-->
+		<div class="tcp-filterSidebar" id="tcp-exportSidebar-open">
+			<div class="tcp-filtSidebar-cont">
+				<a href="#" class="tcp-close-filterbar"></a>
+				<h4>Export Options</h4>
+				<div class="tcp-filterSidebar-bx">					
+					<div class="tcp-filter-overflow">					
+						<ul class="tcp-filter-catlist">
+							<li>
+								<div class="radioGroup">																
+									<label class="radioLabel">
+										<input type="radio" name="radio1" class="radiobutCustom" ng-click="taskdetailsOnAttachment('true')" checked/>
+										Task Details &amp; Store Attachments
+									</label>
+									<label class="radioLabel">
+										<input type="radio" name="radio1" class="radiobutCustom" ng-click="taskdetailsOnAttachment('false')"/>
+										All Store Attachments
+									</label>
+								</div>
+							</li>
+							<li><input type="checkbox" name="optcheck" ng-model="chkstatus" ng-init='chkstatus=false' ng-click="AllAttachmentData(chkstatus)"/>All Stores</li>
+							
+							<li ng-repeat="af in [{'name':'Regions'},{'name':'Districts'},{'name':'Store ID'},{'name':'Store Name'}]">
+								<a href="#" id="lit" >{{af.name}}</a>
+								<ul class="filterSubLevel" ng-if="af.name=='Regions'">
+									<li>
+										<div class="tcp-search-bx">
+											<input type="text" value="" placeholder="SEARCH" ng-model="searchtextattch" class="search-txtbx"/>
+											<input type="button" value="" class="search-but"/>
+											<div class="clearfix"></div>
+										</div>
+										<ul class="checkboxListing">
+											<li class="fullWidth allstoreCheck">
+												<label>
+													<input type="checkbox" name="filterGroup1"  ng-checked="chekcheckedforattachment('All',af.name)"  ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(0,'All',af.name,checkStatusforAttachment)"/>All
+													
+												</label>
+											</li>
+											<li ng-repeat="r1 in PDData |filter:searchtextattch|orderBy:'storeId.regionId' as sortedPlaces" data-ng-if="sortedPlaces[$index-1].storeId.regionId!= r1.storeId.regionId">
+												<label >
+													<input type="checkbox" name="filterGroup1" class="checkboxCustom" ng-checked="chekcheckedforattachment(r1.storeId.regionId,af.name)" ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(r1.id,r1.storeId.regionId,af.name,checkStatusforAttachment)"/>{{r1.storeId.regionId}}
+													
+												</label>
+											</li>
+										</ul>
+										<div class="clearfix"></div>
+									</li>
+								</ul>
+								
+								<ul class="filterSubLevel" ng-if="af.name=='Districts'">
+									<li>
+										<div class="tcp-search-bx">
+											<input type="text" value="" placeholder="SEARCH" ng-model="searchtextattch" class="search-txtbx"/>
+											<input type="button" value="" class="search-but"/>
+											<div class="clearfix"></div>
+										</div>
+										<ul class="checkboxListing">
+											<li class="fullWidth allstoreCheck">
+												<label>
+													<input type="checkbox" name="filterGroup1" ng-checked="chekcheckedforattachment('All',af.name)"  ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(0,'All',af.name,checkStatusforAttachment)"/>All Stores
+													
+												</label>
+											</li>
+											<li ng-repeat="r2 in PDData |filter:searchtextattch|orderBy:'storeId.districtId' as sortedPlaces" data-ng-if="sortedPlaces[$index-1].storeId.districtId!= r2.storeId.districtId">
+												<label >
+													<input type="checkbox" name="filterGroup1" class="checkboxCustom" ng-checked="chekcheckedforattachment(r2.storeId.districtId,af.name)"  ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(r2.ID,r2.storeId.districtId,af.name,checkStatusforAttachment)" />{{r2.storeId.districtId}}
+													
+												</label>
+											</li>
+										</ul>
+										<div class="clearfix"></div>
+									</li>
+								</ul>
+								
+								<ul class="filterSubLevel" ng-if="af.name=='Store ID'">
+									<li>
+										<div class="tcp-search-bx">
+											<input type="text" value="" placeholder="SEARCH" ng-model="searchtextattch" class="search-txtbx"/>
+											<input type="button" value="" class="search-but"/>
+											<div class="clearfix"></div>
+										</div>
+										<ul class="checkboxListing">
+											<li class="fullWidth allstoreCheck">
+												<label>
+													<input type="checkbox" name="filterGroup1" ng-checked="chekcheckedforattachment('All',af.name)"  ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(0,'All',af.name,checkStatusforAttachment)"/>All 
+													All Stores
+												</label>
+											</li>
+											<li ng-repeat="r3 in PDData |filter:searchtextattch|orderBy:'storeId.storeNumber' as sortedPlaces" data-ng-if="sortedPlaces[$index-1].storeId.storeNumber!= r3.storeId.storeNumber">
+												<label>
+													<input type="checkbox" name="filterGroup1" class="checkboxCustom" ng-checked="chekcheckedforattachment(r3.storeId.storeNumber,af.name)" ng-model='checkStatusforAttachment'  value="{{af.name}}" ng-init='checkStatusforAttachment=false' ng-click="arrayforattachment(r3.ID,r3.storeId.storeNumber,af.name,checkStatusforAttachment)"/>{{r3.storeId.storeNumber}}
+													
+												</label>
+											</li>
+										</ul>
+										<div class="clearfix"></div>
+									</li>
+								</ul>
+								
+								<div class="clearfix"></div>
+							</li>
+							
+						</ul>
+						<div class="clearfix"></div>
+					</div>					
+				</div>
+				<div class="tcp-filter-button">
+					<input type="button" class="tcp-filter-saveBut" value="PRINT"/>
+					<input type="button" class="tcp-filter-resetBut" ng-click="DownloadAttchment()" value="DOWNLOAD"/>
+				</div>
+			</div>			
+		</div>
+		<!--export sidebar end-->
+		
+		<!--create new task popup start-->
+		<div id="createNewtask" class="createNewtask" style="display: none;">
+			<div class="white-shad-bx parent_div">
+				<h3 class="heading3">Continue Working on Drafts:</h3>
+				<a href="#" class="viewall-but">view all</a>
+
+				<div class="ready-review-table">								
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr class="bgcol1">
+								<th width="15%" scope="col" ng-click="orderByFieldDrfatComman='ID'; reverseDrfatComman = !reverseDrfatComman">Task ID <span ng-show="orderByFieldDrfatComman== 'ID'"><span ng-show="!reverseDrfatComman"><span class="blue-top-arrow"></span></span><span ng-show="reverseDrfatComman"><span class="blue-btm-arrow"></span></span></span></th>
+								<th width="29%" scope="col" ng-click="orderByFieldDrfatComman='taskName'; reverseDrfatComman = !reverseDrfatComman">Task Name <span ng-show="orderByFieldDrfatComman== 'taskName'"><span ng-show="!reverseDrfatComman"><span class="blue-top-arrow"></span></span><span ng-show="reverseDrfatComman"><span class="blue-btm-arrow"></span></span></span></th>
+								<th width="18%" scope="col" ng-click="orderByFieldDrfatComman='taskLiveDate'; reverseDrfatComman = !reverseDrfatComman">Live Date <span ng-show="orderByFieldDrfatComman== 'taskLiveDate'"><span ng-show="!reverseDrfatComman"><span class="blue-top-arrow"></span></span><span ng-show="reverseDrfatComman"><span class="blue-btm-arrow"></span></span></span></th>
+								<th width="18%" scope="col" ng-click="orderByFieldDrfatComman='taskEndDate'; reverseDrfatComman = !reverseDrfatComman">Close Date <span ng-show="orderByFieldDrfatComman== 'taskEndDate'"><span ng-show="!reverseDrfatComman"><span class="blue-top-arrow"></span></span><span ng-show="reverseDrfatComman"><span class="blue-btm-arrow"></span></span></span></th>
+								<th width="10%" scope="col" ng-click="orderByFieldDrfatComman='status.name'; reverseDrfatComman = !reverseDrfatComman">STATUS <span ng-show="orderByFieldDrfatComman== 'status.name'"><span ng-show="!reverseDrfatComman"><span class="blue-top-arrow"></span></span><span ng-show="reverseDrfatComman"><span class="blue-btm-arrow"></span></span></span></th>
+								<th width="10%" scope="col">Delete</th>
+							</tr>
+							<tr class="bgcol2" ng-repeat="d in DraftData | limitTo : CommanDraftcount |orderBy:orderByFieldDrfatComman:reverseDrfatComman">
+								<td>{{d.ID}}</td>
+								<td><a ng-click="TaskEdit(d.ID)" class="ShowHover">{{d.taskName}}</a></td>
+								<td>{{d.taskLiveDate | date:'dd/MM/yyyy'}}</td>
+								<td>{{d.taskEndDate | date:'dd/MM/yyyy'}}</td>
+								<td>{{d.status.name}}</td>
+								<td><div class="text-center"><a href="#deletePopup" ng-click="confirmDelete(d.ID)" class="delete-but delFancy">&nbsp;</a></div></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<a href="#" class="createNewtaskBut">Create New Task</a>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+		<!--create new task popup end-->
+		
+		<!--alert popup start-->
+        <div id="alertPopup" class="delete-popup" style="display: none;">
+            <h6></h6>
+            <a href="#" class="cancelPopup">OK</a>
+        </div>
+        <!--delete popup end-->
+        <!--delete popup start-->
+		<div id="ConfirmdeletePopup" class="delete-popup" style="display: none;">
+			<h6>Are you sure you want to delete? <span>This can’t be undone.</span></h6>
+			<a href="#" class="cancelPopup">Cancel</a>
+			<a ng-click="deleteManagement()" class="yesdelPopup ShowHover">Yes, Delete</a>
+		</div>
+		<!--delete popup end-->
+
+		
+		<!--delete popup start-->
+		<div id="deletePopup" class="delete-popup" style="display: none;">
+			<h6>Are you sure you want to delete? <span>This can’t be undone.</span></h6>
+			<a href="#" class="cancelPopup">Cancel</a>
+			<a href="#" ng-click="deleteDraft()" class="yesdelPopup">Yes, Delete</a>
+		</div>
+		<!--delete popup end-->
+		
+	</div>
+	<!--main wrapper end-->
+	
+
+<!-- jQuery --> 
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery.bxslider.min.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery-migrate-1.4.1.min.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/jquery.fancybox.js"></script>
+<script type="text/javascript" src="/sites/vsm/SiteApplication/Assets/js/custom.js"></script>
+	
+</body>
+</html>
